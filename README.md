@@ -6,11 +6,15 @@ Solves the motion of an object locked to a vertical circular track of radius $R$
 
 ## Mathematical model
 
+Euler-Lagrange equation, with propulsion, drag, and friction as generalized forces, solved for $\ddot{\theta}$:
+
+![Derivation, page 1](derivation_pg1.png)
+![Derivation, page 2](derivation_pg2.png)
+**Note:** one error on page 2, $$mR^2\ddot{\theta}$$ should have a plus ($$+$$) $$mg\cos\theta$$ term rather then a minus ($$-$$) term.
+
 $\theta$ is measured from the bottom of the loop. The normal force comes from the radial balance:
 
 $$F_N = m\left(R\dot{\theta}^2 + g\cos\theta\right)$$
-
-Euler-Lagrange equation, with propulsion, drag, and friction as generalized forces, solved for $\ddot{\theta}$:
 
 $$\ddot{\theta} = \frac{F_p}{mR} - \frac{g}{R}\sin\theta - \frac{c}{m}\dot{\theta} - \mu\left|\dot{\theta}^2 + \frac{g}{R}\cos\theta\right| \mathrm{sgn}(\dot{\theta})$$
 
@@ -32,10 +36,7 @@ Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, 
 
 | Quantity | Value |
 | --- | --- |
-| Critical propulsive force | 9.731 N |
 | Asymptotic max g-force | 5.69 g |
-
-$F_N$ reaches zero at about 148.5°, a little before the top. The peak g-force is at about 335°, just before the bottom.
 
 ### Kinematics
 
