@@ -28,7 +28,7 @@ g-force is $F_N/(mg)$.
 - **Time scale:** time windows are in units of $\tau = \sqrt{R/g}$, so they work for any loop size.
 - **Critical force:** the object starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $F_p$ where the smallest $F_N$ over the top half of the first loop is exactly zero.
 - **Events:** each first-loop run stops when the object clears the top half or stalls.
-- **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $F_N/(mg)$ is taken over the second half.
+- **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $F_N/(mg)$ is taken over the last sixteenth.
 
 ## Results
 
