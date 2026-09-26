@@ -52,7 +52,7 @@ Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\
 
 ## Limitations
 
-- The object is a point mass locked to the track, so $F_N$ can go negative in the animated run.
+- The object is a point mass locked to the track.
 - Friction has no static component.
 - With $c = 0$ and $\mu = 0$ there is no asymptotic state, and the script raises an error.
 - The animated run uses $F_p = 10$ N. Larger $m$, $g$, $\mu$, or $R$ need a larger $F_p$ to loop.
