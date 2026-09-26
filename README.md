@@ -10,7 +10,7 @@ Euler-Lagrange equation, with propulsion, drag, and friction as generalized forc
 
 ![Derivation, page 1](derivation_pg1.png)
 ![Derivation, page 2](derivation_pg2.png)
-**Note:** one error on page 2, $$mR^2\ddot{\theta}$$ should have a plus ($$+$$) $$mg\cos\theta$$ term rather then a minus ($$-$$) term.
+**Note:** one error on page 2, $$mR^2\ddot{\theta}$$ should have a plus ($+$) $mg\cos\theta$ term rather than a minus ($-$) term.
 
 $\theta$ is measured from the bottom of the loop. The normal force comes from the radial balance:
 
@@ -65,4 +65,4 @@ Requires `numpy`, `scipy`, and `matplotlib`.
 python circular_motion.py
 ```
 
-Prints `max g-force = 5.69 g` and saves `circular_motion.gif`, `kinematics.png`, and `generalized_forces.png`.
+Prints `max g-force` and saves `circular_motion.gif`, `kinematics.png`, and `generalized_forces.png`.
