@@ -29,6 +29,7 @@ g-force is $F_N/(mg)$.
 - **Critical force:** the object starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $F_p$ where the smallest $F_N$ over the top half of the first loop is exactly zero.
 - **Events:** each first-loop run stops when the object clears the top half or stalls.
 - **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $F_N/(mg)$ is taken over the last sixteenth.
+- **Automated tests:** `test_1.py` checks the model against physics that can be worked out by hand, using pytest.
 
 ## Results
 
@@ -50,6 +51,16 @@ Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\
 
 ![Generalized forces vs time](forces.png)
 
+## Verification
+
+`test_1.py` runs three checks:
+
+| Test | Checks |
+| --- | --- |
+| Normal force at the top | $F_N = 0$ when $R\dot{\theta}^2 = g$ at $\theta = \pi$, the condition the critical force depends on |
+| Work-energy | The change in mechanical energy equals the work done by propulsion, drag, and friction, to 1 part in $10^5$. Covers every term in $\ddot{\theta}$ |
+| Asymptotic convergence | The peak g-force in the last sixteenth of the run matches the peak in the sixteenth before it, so speed has stopped growing loop to loop |
+
 ## Limitations
 
 - The object is a point mass locked to the track.
@@ -59,10 +70,16 @@ Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\
 
 ## Usage
 
-Requires `numpy`, `scipy`, and `matplotlib`.
+Requires `numpy`, `scipy`, `matplotlib`, and `pytest`.
 
 ```bash
 python circular_motion.py
 ```
 
 Prints `max g-force` and saves `circular_motion.gif`, `kinematics.png`, and `generalized_forces.png`.
+
+## Running tests
+
+```bash
+pytest -v
+```
