@@ -1,5 +1,5 @@
 # Analytical_Mechanics_Numerical_Methods_Projects
-
+![tests](https://github.com/arredondojullianjoseph/Analytical_Mechanics_Numerical_Methods_Projects/actions/workflows/tests.yml/badge.svg)
 ## Project 1: Vertical Loop Motion Solver
 
 Solves the motion of an object locked to a vertical circular track of radius $R$ with a constant propulsive force, linear drag, and friction proportional to the normal force. The script animates the motion, plots position, speed, acceleration, and the generalized forces against time, and finds the largest g-force the object reaches once its speed stops growing loop to loop.
