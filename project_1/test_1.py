@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.integrate import solve_ivp, cumulative_trapezoid
 
-import circular_motion as cm
+import Project_1 as cm
 
 def energy(theta, omega):
     return 0.5*cm.m*(cm.R*omega)**2 - cm.m*cm.g*cm.R*np.cos(theta)
