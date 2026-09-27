@@ -8,7 +8,7 @@ Solves the motion of an object locked to a vertical circular track of radius $R$
 
 ### Mathematical model
 
-Derivation of the equarion of motion:
+Derivation of the equation of motion:
 
 ![Derivation, page 1](project_1/derivation_pg1.png)
 
