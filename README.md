@@ -76,7 +76,7 @@ Requires `numpy`, `scipy`, `matplotlib`, and `pytest`.
 
 ```bash
 cd project_1
-python circular_motion.py
+python Project_1.py
 ```
 
 Prints `max g-force` and saves `circular_motion.gif`, `kinematics.png`, and `generalized_forces.png` in `project_1/`.
