@@ -69,6 +69,7 @@ axes[2].plot(sol.t, a)
 axes[2].set_ylabel("acceleration a (m/s^2)")
 axes[2].set_xlabel("t (s)")
 fig.tight_layout()
+fig.savefig("kinematics.png", dpi=150)
 
 # 3. Make plots of all generalized forces (separately) vs time
 # Calculate each force component acting on the system
@@ -90,6 +91,7 @@ for ax, q, label in zip(axes, Q, labels):
     ax.set_ylabel(label)
 axes[3].set_xlabel("t (s)")
 fig.tight_layout()
+fig.savefig("forces.png", dpi=150)
 
 # 4. Find the critical propulsive force and asymptotic g-force
 if c == 0 and mu == 0:
@@ -112,7 +114,7 @@ def lowest_normal_force(F_p):
     Run simulation to see if the vehicle makes the loop. 
     Returns the minimum normal force experienced over the top half.
     """
-    # Start at -pi/2 (horizontal left) at rest
+    # Start at rest on the left vertical section of the track (theta = -pi/2)
     run = solve_ivp(dSdt, [0, 1e6*tau], [-np.pi/2, 0.0], args=(F_p,), events=[passed_top, stalled],
                     dense_output=True, rtol=1e-10, atol=1e-10)
     
@@ -141,4 +143,4 @@ long_run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(F_p_crit,),
 g_force = normal_force(*long_run.y) / (m*g)
 
 # Print the max g-force from the last sixteenth of the run (assuming transients have died out)
-print("max g-force = {:.2f} g".format(g_force[len(g_force)//16:].max()))
+print("max g-force = {:.2f} g".format(g_force[-len(g_force)//16:].max()))

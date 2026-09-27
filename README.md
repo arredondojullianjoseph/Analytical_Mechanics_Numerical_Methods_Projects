@@ -1,5 +1,7 @@
 # Analytical_Mechanics_Numerical_Methods_Projects
 
+![tests](https://github.com/arredondojullianjoseph/Analytical_Mechanics_Numerical_Methods_Projects/actions/workflows/tests.yml/badge.svg)
+
 ## Project 1: Vertical Loop Motion Solver
 
 Solves the motion of an object locked to a vertical circular track of radius $R$. The object feels a constant propulsive force, linear drag, and friction proportional to the normal force. The script animates the motion, plots position, speed, acceleration, and the generalized forces against time, and finds the largest g-force the object reaches once its speed stops growing loop to loop.
@@ -11,8 +13,10 @@ Solves the motion of an object locked to a vertical circular track of radius $R$
 Euler-Lagrange equation, with propulsion, drag, and friction as generalized forces, solved for $\ddot{\theta}$:
 
 ![Derivation, page 1](project_1/derivation_pg1.png)
+
 ![Derivation, page 2](project_1/derivation_pg2.png)
-**Note:** one error on page 2, $$mR^2\ddot{\theta}$$ should have a plus ($+$) $mg\cos\theta$ term rather than a minus ($-$) term.
+
+**Note:** one error on page 2, $mR^2\ddot{\theta}$ should have a plus ($+$) $mg\cos\theta$ term rather than a minus ($-$) term.
 
 $\theta$ is measured from the bottom of the loop. The normal force comes from the radial balance:
 
@@ -79,7 +83,7 @@ cd project_1
 python Project_1.py
 ```
 
-Prints `max g-force` and saves `circular_motion.gif`, `kinematics.png`, and `generalized_forces.png` in `project_1/`.
+Prints `max g-force` and saves `circular_motion.gif`, `kinematics.png`, and `forces.png` in `project_1/`.
 
 ### Running tests
 
