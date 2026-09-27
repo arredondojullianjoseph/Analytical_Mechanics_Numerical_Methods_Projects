@@ -12,20 +12,20 @@ from scipy.integrate import solve_ivp
 from scipy.optimize import brentq
 
 # System parameters
-m, R, g, c, mu = 1.0, 2.0, 9.81, 0.5, 0.2
-F_p = 10
-tau = np.sqrt(R/g)       # Characteristic time scale
+m, r, g, c, mu = 1.0, 2.0, 9.81, 0.5, 0.2
+f_p = 10
+tau = np.sqrt(r/g)       # Characteristic time scale
 eps = 1e-3/tau           # Small parameter to smooth the friction sign function
 
-def dSdt(t, S, F_p=F_p):
+def dSdt(t, S, f_p=f_p):
     """
     Compute the state derivatives for the ODE solver.
     """
     theta, omega = S
   
     # Angular acceleration. 
-    alpha = (F_p / (m*R) - (g/R)*np.sin(theta) - (c/m)*omega 
-             - np.abs(mu*(omega**2 + (g/R)*np.cos(theta)))*np.tanh(omega/eps)) #np.tanh(omega/eps) smoothly approximates np.sign(omega)
+    alpha = (f_p / (m*r) - (g/r)*np.sin(theta) - (c/m)*omega 
+             - np.abs(mu*(omega**2 + (g/r)*np.cos(theta)))*np.tanh(omega/eps)) #np.tanh(omega/eps) smoothly approximates np.sign(omega)
     return [omega, alpha]
     
 # Time array and initial conditions
@@ -37,13 +37,13 @@ sol = solve_ivp(dSdt, [t_eval[0], max(t_eval)], S0, t_eval=t_eval)
 
 # 1. Make an animation of the motion
 theta, omega = sol.y
-x, y = R*np.sin(theta), -R*np.cos(theta) # Convert polar/angular coordinates to Cartesian
+x, y = r*np.sin(theta), -r*np.cos(theta) # Convert polar/angular coordinates to Cartesian
 
 fig, ax = plt.subplots(figsize=(5, 5))
-ax.set_xlim(-1.3*R, 1.3*R)
-ax.set_ylim(-1.3*R, 1.3*R)
+ax.set_xlim(-1.3*r, 1.3*r)
+ax.set_ylim(-1.3*r, 1.3*r)
 ax.set_aspect("equal")
-ax.add_patch(plt.Circle((0, 0), R, fill=False, linestyle="--", color="gray"))
+ax.add_patch(plt.Circle((0, 0), r, fill=False, linestyle="--", color="gray"))
 ball, = ax.plot([], [], "o", color="tab:red", markersize=10)
 
 def draw_frame(frame):
@@ -55,8 +55,8 @@ ani = animation.FuncAnimation(fig, draw_frame, frames=range(0, len(sol.t), 4), i
 ani.save("circular_motion.gif", writer=animation.PillowWriter(fps=15))
 
 # 2. Make plots of position vs time, speed vs time, and acceleration vs time
-v = R*omega
-a = R*dSdt(sol.t, sol.y)[1]
+v = r*omega
+a = r*dSdt(sol.t, sol.y)[1]
 
 fig, axes = plt.subplots(3, 1, figsize=(7, 8), sharex=True)
 axes[0].plot(sol.t, x, label="x")
@@ -75,10 +75,10 @@ fig.savefig("kinematics.png", dpi=150)
 # Calculate each force component acting on the system
 def normal_force(theta, omega):
     """Calculate the normal force exerted by the track on the vehicle."""
-    return m*(R*omega**2 + g*np.cos(theta))
+    return m*(r*omega**2 + g*np.cos(theta))
   
-Q = R * np.array([
-    np.full_like(sol.t, F_p), 
+Q = r * np.array([
+    np.full_like(sol.t, f_p), 
     -m*g*np.sin(theta), 
     -c*v, 
     -mu*np.abs(normal_force(theta, omega))*np.tanh(omega/eps)
@@ -97,25 +97,25 @@ fig.savefig("forces.png", dpi=150)
 if c == 0 and mu == 0:
     raise ValueError("no dissipation: speed grows forever, so there is no asymptotic g-force")
 
-def passed_top(t, S, F_p):
+def passed_top(t, S, f_p):
     """triggered when the vehicle successfully makes it over the top."""
     return S[0] - 1.5*np.pi
 passed_top.terminal = True
 passed_top.direction = 1
 
-def stalled(t, S, F_p):
+def stalled(t, S, f_p):
     """triggered if the vehicle falls back or stalls."""
     return S[1] - 10*eps
 stalled.terminal = True
 stalled.direction = -1
 
-def lowest_normal_force(F_p):
+def lowest_normal_force(f_p):
     """
     Run simulation to see if the vehicle makes the loop. 
     Returns the minimum normal force experienced over the top half.
     """
     # Start at rest on the left vertical section of the track (theta = -pi/2)
-    run = solve_ivp(dSdt, [0, 1e6*tau], [-np.pi/2, 0.0], args=(F_p,), events=[passed_top, stalled],
+    run = solve_ivp(dSdt, [0, 1e6*tau], [-np.pi/2, 0.0], args=(f_p,), events=[passed_top, stalled],
                     dense_output=True, rtol=1e-10, atol=1e-10)
     
     # If the 'passed_top' event didn't trigger, the vehicle stalled/fell
@@ -127,16 +127,16 @@ def lowest_normal_force(F_p):
     # Filter for the upper portion of the loop and find the minimum normal force
     return normal_force(theta_run, omega_run)[theta_run >= np.pi/2].min()
 
-# Bracket the root by doubling F_p until the vehicle clears the loop with a positive normal force
-F_p_high = m*g
-while lowest_normal_force(F_p_high) < 0:
-    F_p_high *= 2
+# Bracket the root by doubling f_p until the vehicle clears the loop with a positive normal force
+f_p_high = m*g
+while lowest_normal_force(f_p_high) < 0:
+    f_p_high *= 2
 
-# Find the exact F_p where the minimum normal force is exactly 0
-F_p_crit = brentq(lowest_normal_force, 0.0, F_p_high)
+# Find the exact f_p where the minimum normal force is exactly 0
+f_p_crit = brentq(lowest_normal_force, 0.0, f_p_high)
 
-# Run a long simulation with the critical F_p to reach a steady state
-long_run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(F_p_crit,),
+# Run a long simulation with the critical f_p to reach a steady state
+long_run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(f_p_crit,),
                      t_eval=np.linspace(0, 1000*tau, 100001), rtol=1e-10, atol=1e-10)
 
 # Calculate g-forces for the entire run
