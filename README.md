@@ -2,13 +2,13 @@
 
 ## Project 1: Vertical Loop Motion Solver
 
-Solves the motion of an object locked to a vertical circular track of radius $R$ wirh a constant propulsive force, linear drag, and friction proportional to the normal force. The script animates the motion, plots position, speed, acceleration, and the generalized forces against time, and finds the largest g-force the object reaches once its speed stops growing loop to loop.
+Solves the motion of an object locked to a vertical circular track of radius $R$ with a constant propulsive force, linear drag, and friction proportional to the normal force. The script animates the motion, plots position, speed, acceleration, and the generalized forces against time, and finds the largest g-force the object reaches once its speed stops growing loop to loop.
 
 ![Object on the vertical loop](project_1/circular_motion.gif)
 
 ### Mathematical model
 
-Euler-Lagrange equation, with propulsion, drag, and friction as generalized forces, solved for $\ddot{\theta}$:
+Derivation of the equarion of motion:
 
 ![Derivation, page 1](project_1/derivation_pg1.png)
 
@@ -17,6 +17,7 @@ Euler-Lagrange equation, with propulsion, drag, and friction as generalized forc
 **Note:** one error on page 2, $mR^2\ddot{\theta}$ should have a plus ($+$) $mg\cos\theta$ term rather than a minus ($-$) term.
 
 $\theta$ is measured from the bottom of the loop. 
+
 $$F_N = m\left(R\dot{\theta}^2 + g\cos\theta\right)$$
 
 $$\ddot{\theta} = \frac{F_p}{mR} - \frac{g}{R}\sin\theta - \frac{c}{m}\dot{\theta} - \mu\left|\dot{\theta}^2 + \frac{g}{R}\cos\theta\right| \mathrm{sgn}(\dot{\theta})$$
@@ -29,14 +30,14 @@ g-force is $F_N/(mg)$.
 
 - **Solver:** `solve_ivp` integrates $[\dot{\theta}, \ddot{\theta}]$. $\mathrm{sgn}(\dot{\theta})$ is smoothed to $\tanh(\dot{\theta}/\epsilon)$ so the solver doesn't stall each time $\dot{\theta}$ crosses zero.
 - **Time scale:** time windows are in units of $\tau = \sqrt{R/g}$, so that they can work for any loop size.
-- **Critical force:** the object starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $f_p$ where the smallest $f_N$ over the top half of the first loop is exactly zero.
+- **Critical force:** the object starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $F_p$ where the smallest $F_N$ over the top half of the first loop is exactly zero.
 - **Events:** each first-loop run stops when the object clears the top half or stalls.
-- **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $f_N/(mg)$ is taken over the last sixteenth.
+- **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $F_N/(mg)$ is taken over the last sixteenth.
 - **Automated tests:** `project_1/test_1.py` checks the model against physics that can be worked out by hand, using pytest.
 
 ### Results
 
-Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, $F_p = 10$ N. $f_p$ applies to the animated run only. 
+Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, $F_p = 10$ N. $F_p$ applies to the animated run only. 
 
 | Quantity | Value |
 | --- | --- |
@@ -44,7 +45,7 @@ Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, 
 
 #### Kinematics
 
-Position ($x$ and $y$), speed, and tangential acceleration for the animated run ($f_p = 10$ N, starting from rest at the bottom).
+Position ($x$ and $y$), speed, and tangential acceleration for the animated run ($F_p = 10$ N, starting from rest at the bottom).
 
 ![Position, speed, and acceleration vs time](project_1/kinematics.png)
 
@@ -60,7 +61,7 @@ Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\
 
 | Test | Checks |
 | --- | --- |
-| Normal force at the top | $f_N = 0$ when $R\dot{\theta}^2 = g$ at $\theta = \pi$. |
+| Normal force at the top | $F_N = 0$ when $R\dot{\theta}^2 = g$ at $\theta = \pi$. |
 | Work-energy | The change in mechanical energy equals the work done by propulsion, drag, and friction, to 1 part in $10^5$ |
 | Asymptotic convergence | The peak g-force in the last sixteenth of the run matches the peak in the sixteenth before it, so speed has stopped growing loop to loop |
 
@@ -69,7 +70,7 @@ Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\
 - The object is a point mass locked to the track.
 - Friction has no static component.
 - With $c = 0$ and $\mu = 0$ there is no asymptotic state, and the script raises an error.
-- The animated run uses $F_p = 10$ N. A Larger $m$, $g$, $\mu$, or $R$ wouldneed a larger $f_p$ to loop.
+- The animated run uses $F_p = 10$ N. A larger $m$, $g$, $\mu$, or $R$ would need a larger $F_p$ to loop.
 
 ### Usage
 
