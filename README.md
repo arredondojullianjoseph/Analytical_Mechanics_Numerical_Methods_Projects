@@ -1,5 +1,4 @@
 # Analytical_Mechanics_Numerical_Methods_Projects
-![tests](https://github.com/arredondojullianjoseph/Analytical_Mechanics_Numerical_Methods_Projects/actions/workflows/tests.yml/badge.svg)
 ## Project 1: Vertical Loop Motion Solver
 
 Solves the motion of an object locked to a vertical circular track of radius $R$ with a constant propulsive force, linear drag, and friction proportional to the normal force. The script animates the motion, plots position, speed, acceleration, and the generalized forces against time, and finds the largest g-force the object reaches once its speed stops growing loop to loop.
@@ -10,9 +9,9 @@ Solves the motion of an object locked to a vertical circular track of radius $R$
 
 Derivation of the equation of motion:
 
-![Derivation, page 1](project_1/derivation_pg1.png)
+[Derivation, page 1](project_1/derivation_pg1.png)
 
-![Derivation, page 2](project_1/derivation_pg2.png)
+[Derivation, page 2](project_1/derivation_pg2.png)
 
 **Note:** one error on page 2, $mR^2\ddot{\theta}$ should have a plus ($+$) $mg\cos\theta$ term rather than a minus ($-$) term.
 
