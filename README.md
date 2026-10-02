@@ -1,9 +1,10 @@
 # Analytical_Mechanics_Numerical_Methods_Projects
+![tests](https://github.com/arredondojullianjoseph/Analytical_Mechanics_Numerical_Methods_Projects/actions/workflows/tests.yml/badge.svg)
 ## Project 1: Vertical Loop Motion Solver
 
-Solves the motion of an object locked to a vertical circular track of radius $R$ with a constant propulsive force, linear drag, and friction proportional to the normal force. The script animates the motion, plots position, speed, acceleration, and the generalized forces against time, and finds the largest g-force the object reaches once its speed stops growing loop to loop.
+Solves the motion of a bead locked to a vertical circular wire of radius $R$ with a constant propulsive force, linear drag, and friction proportional to $|F_N|$. The bead cannot leave the wire. The script animates the default parameters, plots position, speed, acceleration, and the generalized forces against time, then finds the largest g-force the bead reaches once its speed stops growing loop to loop in the critical case.
 
-![Object on the vertical loop](project_1/circular_motion.gif)
+![Bead on the vertical loop](project_1/circular_motion.gif)
 
 ### Mathematical model
 
@@ -21,7 +22,7 @@ $$F_N = m\left(R\dot{\theta}^2 + g\cos\theta\right)$$
 
 $$\ddot{\theta} = \frac{F_p}{mR} - \frac{g}{R}\sin\theta - \frac{c}{m}\dot{\theta} - \mu\left|\dot{\theta}^2 + \frac{g}{R}\cos\theta\right| \mathrm{sgn}(\dot{\theta})$$
 
-Generalized forces are the tangential forces times $R$ (N·m).
+$F_N$ is the inward normal. Friction uses $|F_N|$ because the bead stays on the wire even if $F_N$ would change sign; a coaster would have left the track at $F_N = 0$. Generalized forces are the tangential forces times $R$ (N·m).
 
 g-force is $F_N/(mg)$.
 
@@ -29,14 +30,15 @@ g-force is $F_N/(mg)$.
 
 - **Solver:** `solve_ivp` integrates $[\dot{\theta}, \ddot{\theta}]$. $\mathrm{sgn}(\dot{\theta})$ is smoothed to $\tanh(\dot{\theta}/\epsilon)$ so the solver doesn't stall each time $\dot{\theta}$ crosses zero.
 - **Time scale:** time windows are in units of $\tau = \sqrt{R/g}$, so that they can work for any loop size.
-- **Critical force:** the object starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $F_p$ where the smallest $F_N$ over the top half of the first loop is exactly zero.
-- **Events:** each first-loop run stops when the object clears the top half or stalls.
+- **Critical force:** the bead starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $F_p$ where the smallest $F_N$ over the top half of the first loop is exactly zero (the grazing-coaster diagnostic).
+- **Events:** each first-loop run stops when the bead clears the top half or stalls.
 - **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $F_N/(mg)$ is taken over the last sixteenth.
+- **Figures:** GIF and plots use the default parameters ($F_p = 10$ N, rest at the bottom). The critical-force search runs after that.
 - **Automated tests:** `project_1/test_1.py` checks the model against physics that can be worked out by hand, using pytest.
 
 ### Results
 
-Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, $F_p = 10$ N. $F_p$ applies to the animated run only. 
+Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, $F_p = 10$ N. $F_p$ applies to the animated run. The reported g-force is the critical case. 
 
 | Quantity | Value |
 | --- | --- |
@@ -44,7 +46,7 @@ Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, 
 
 #### Kinematics
 
-Position ($x$ and $y$), speed, and tangential acceleration for the animated run ($F_p = 10$ N, starting from rest at the bottom).
+Position ($x$ and $y$), speed, and acceleration (tangential $R\ddot{\theta}$ and centripetal $R\dot{\theta}^2$) for the default run ($F_p = 10$ N, starting from rest at the bottom).
 
 ![Position, speed, and acceleration vs time](project_1/kinematics.png)
 
@@ -56,31 +58,32 @@ Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\
 
 ### Verification
 
-`project_1/test_1.py` runs three checks:
+`project_1/test_1.py` runs four checks:
 
 | Test | Checks |
 | --- | --- |
 | Normal force at the top | $F_N = 0$ when $R\dot{\theta}^2 = g$ at $\theta = \pi$. |
 | Work-energy | The change in mechanical energy equals the work done by propulsion, drag, and friction, to 1 part in $10^5$ |
 | Asymptotic convergence | The peak g-force in the last sixteenth of the run matches the peak in the sixteenth before it, so speed has stopped growing loop to loop |
+| First-loop grazing | At $F_{p,\mathrm{crit}}$, the smallest $F_N$ on the top half of the first loop is zero and not negative |
 
 ### Limitations
 
-- The object is a point mass locked to the track.
+- The object is a point mass locked to the wire. $F_N < 0$ is allowed by the constraint; it is only used as a diagnostic when finding $F_{p,\mathrm{crit}}$.
 - Friction has no static component.
 - With $c = 0$ and $\mu = 0$ there is no asymptotic state, and the script raises an error.
-- The animated run uses $F_p = 10$ N. A larger $m$, $g$, $\mu$, or $R$ would need a larger $F_p$ to loop.
+- A larger $m$, $g$, $\mu$, or $R$ would need a larger $F_p$ to loop.
 
 ### Usage
 
-Requires `numpy`, `scipy`, `matplotlib`, and `pytest`.
+Requires `numpy`, `scipy`, `matplotlib`, `pillow`, and `pytest`.
 
 ```bash
 cd project_1
 python Project_1.py
 ```
 
-Prints `max g-force` and saves `circular_motion.gif`, `kinematics.png`, and `forces.png` in `project_1/`.
+Prints `max g-force` for the critical case and saves `circular_motion.gif`, `kinematics.png`, and `forces.png` from the default run in `project_1/`.
 
 ### Running tests
 

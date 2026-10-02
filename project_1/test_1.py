@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from scipy.integrate import solve_ivp, cumulative_trapezoid
 
 import Project_1 as cm
@@ -13,8 +14,8 @@ def test_normal_force_zero_at_top_at_minimum_speed():
   
 def test_work_energy_with_all_forces():
     # Change in energy must equal the work done by propulsion, drag, and friction.
-    t = np.linspace(0, 50*cm.tau, 50001)
-    sol = solve_ivp(cm.dSdt, [0, t[-1]], [0.0, 0.0], t_eval=t, rtol=1e-10, atol=1e-10)
+    t = np.linspace(0, 50*cm.tau, 5001)
+    sol = solve_ivp(cm.dSdt, [0, t[-1]], [0.0, 0.0], t_eval=t, rtol=1e-8, atol=1e-8)
     theta, omega = sol.y
     v = cm.r*omega
     friction = cm.mu*np.abs(cm.normal_force(theta, omega))*np.tanh(omega/cm.eps)
@@ -23,9 +24,21 @@ def test_work_energy_with_all_forces():
     dE = energy(theta, omega) - energy(theta[0], omega[0])
     assert np.max(np.abs(dE - work)) < 1e-5*np.max(np.abs(work))
 
-def test_asymptotic_g_force_has_converged():
+@pytest.fixture(scope="module")
+def critical_case():
+    return cm.critical_propulsion_and_g_force()
+
+def test_asymptotic_g_force_has_converged(critical_case):
     # Once speed stops growing lap to lap, two back-to-back windows reach the same peak g-force.
-    n = len(cm.g_force)
-    earlier = cm.g_force[-2*n//16:-n//16].max()
-    later = cm.g_force[-n//16:].max()
+    _, g_force = critical_case
+    n = len(g_force)
+    earlier = g_force[-2*n//16:-n//16].max()
+    later = g_force[-n//16:].max()
     assert abs(later - earlier) < 1e-4*later
+
+def test_first_loop_normal_force_nonnegative_at_critical(critical_case):
+    # F_p,crit is first-loop grazing: min F_N on the top half is zero, not negative.
+    f_p_crit, _ = critical_case
+    n_min = cm.lowest_normal_force(f_p_crit)
+    assert n_min >= -1e-8
+    assert abs(n_min) < 1e-8
