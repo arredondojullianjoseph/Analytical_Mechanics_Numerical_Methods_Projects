@@ -38,21 +38,27 @@ g-force is $F_N/(mg)$.
 
 ### Results
 
-Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, $F_p = 10$ N. $F_p$ applies to the animated run. The reported g-force is the critical case. 
+Defaults: $m = 1$ kg, $R = 2$ m, $g = 9.81$ m/s², $c = 0.5$ kg/s, $\mu = 0.2$, $F_p = 10$ N, starting from rest at the bottom. Those values are used to animate the motion and to plot position vs time, speed vs time, acceleration vs time, and all generalized forces (separately) vs time.
+
+#### Max asymptotic g-force
+
+A separate scenario starts from rest at a vertical section of track and makes it over the top of the loop with a normal force of zero the first time around, so that if it wasn't locked to the track like a rollercoaster, it would make it around the loop without losing contact.
+
+Given those same conditions and being allowed to continue with the same propulsive force, the largest g-force the vehicle attains once in an asymptotic condition where loop by loop it is no longer gaining speed is 5.69 g.
 
 | Quantity | Value |
 | --- | --- |
-| Asymptotic max g-force | 5.69 g |
+| Largest g-force once loop by loop it is no longer gaining speed | 5.69 g |
 
 #### Kinematics
 
-Position ($x$ and $y$), speed, and acceleration (tangential $R\ddot{\theta}$ and centripetal $R\dot{\theta}^2$) for the default run ($F_p = 10$ N, starting from rest at the bottom).
+Position vs time, speed vs time, and acceleration vs time (tangential $R\ddot{\theta}$ and centripetal $R\dot{\theta}^2$).
 
 ![Position, speed, and acceleration vs time](project_1/kinematics.png)
 
 #### Generalized forces
 
-Propulsion, gravity, linear drag, and friction, each as a generalized force $Q_\theta$ in N·m.
+All generalized forces separately vs time: propulsion, gravity, linear drag, and friction, each as $Q_\theta$ in N·m.
 
 ![Generalized forces vs time](project_1/forces.png)
 

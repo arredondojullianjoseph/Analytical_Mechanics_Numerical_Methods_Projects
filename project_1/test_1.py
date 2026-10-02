@@ -26,7 +26,8 @@ def test_work_energy_with_all_forces():
 
 @pytest.fixture(scope="module")
 def critical_case():
-    return cm.critical_propulsion_and_g_force()
+    f_p_crit = cm.critical_propulsion()
+    return f_p_crit, cm.asymptotic_g_force(f_p_crit)
 
 def test_asymptotic_g_force_has_converged(critical_case):
     # Once speed stops growing lap to lap, two back-to-back windows reach the same peak g-force.

@@ -37,64 +37,6 @@ def normal_force(theta, omega):
     """Inward normal force of the wire on the bead."""
     return m*(r*omega**2 + g*np.cos(theta))
 
-# 4. Find the critical propulsive force and asymptotic g-force
-def passed_top(t, S, f_p):
-    """triggered when the bead successfully makes it over the top."""
-    return S[0] - 1.5*np.pi
-passed_top.terminal = True
-passed_top.direction = 1
-
-def stalled(t, S, f_p):
-    """triggered if the bead falls back or stalls."""
-    return S[1] - 10*eps
-stalled.terminal = True
-stalled.direction = -1
-
-def lowest_normal_force(f_p):
-    """
-    Run simulation to see if the bead makes the loop.
-    Returns the minimum inward normal force over the top half of the first loop.
-    """
-    # Start at rest on the left vertical section of the wire (theta = -pi/2)
-    run = solve_ivp(dSdt, [0, 100*tau], [-np.pi/2, 0.0], args=(f_p,), events=[passed_top, stalled],
-                    dense_output=True, rtol=1e-8, atol=1e-8)
-    
-    # If the 'passed_top' event didn't trigger, the bead stalled/fell
-    if run.t_events[0].size == 0:
-        return -10.0
-        
-    theta_run, omega_run = run.sol(np.linspace(0, run.t_events[0][0], 1001))
-  
-    # Filter for the upper portion of the loop and find the minimum normal force
-    return normal_force(theta_run, omega_run)[theta_run >= np.pi/2].min()
-
-
-def critical_propulsion_and_g_force():
-    """
-    Return (F_p,crit, g_force) for the long critical run.
-
-    F_p,crit is the propulsion at which min F_N over the top half of the first
-    loop is zero, starting from rest at the left vertical. g_force is F_N/(m g)
-    sampled along a 1000*tau integration at that propulsion.
-    """
-    if c == 0 and mu == 0:
-        raise ValueError("no dissipation: speed grows forever, so there is no asymptotic g-force")
-
-    # Bracket the root by doubling f_p until the bead clears the loop with a positive normal force
-    f_p_high = m*g
-    while lowest_normal_force(f_p_high) < 0:
-        f_p_high *= 2
-
-    # Find the exact f_p where the minimum normal force is exactly 0
-    f_p_crit = brentq(lowest_normal_force, 0.0, f_p_high)
-
-    # Run a long simulation with the critical f_p to reach a steady state
-    long_run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(f_p_crit,),
-                         dense_output=True, rtol=1e-8, atol=1e-8)
-    t_sample = np.linspace(0, 1000*tau, 100001)
-    g_force = normal_force(*long_run.sol(t_sample)) / (m*g)
-    return f_p_crit, g_force
-
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import matplotlib.animation as animation
@@ -161,6 +103,75 @@ if __name__ == "__main__":
     fig.tight_layout()
     fig.savefig(out_dir / "forces.png", dpi=150)
 
-    # 4. Critical propulsion and asymptotic g-force
-    _, g_force = critical_propulsion_and_g_force()
+# 4. Find a scenario where the object starts from rest at a vertical
+#    section of track and makes it over the top of the loop with a
+#    normal force of zero the first time around so that if it wasn't
+#    locked to the track like a rollercoaster, that it would make it
+#    around the loop without losing contact.
+def passed_top(t, S, f_p):
+    """triggered when the bead successfully makes it over the top."""
+    return S[0] - 1.5*np.pi
+passed_top.terminal = True
+passed_top.direction = 1
+
+def stalled(t, S, f_p):
+    """triggered if the bead falls back or stalls."""
+    return S[1] - 10*eps
+stalled.terminal = True
+stalled.direction = -1
+
+def lowest_normal_force(f_p):
+    """
+    Run simulation to see if the bead makes the loop.
+    Returns the minimum inward normal force over the top half of the first loop.
+    """
+    # Start at rest on the left vertical section of the wire (theta = -pi/2)
+    run = solve_ivp(dSdt, [0, 100*tau], [-np.pi/2, 0.0], args=(f_p,), events=[passed_top, stalled],
+                    dense_output=True, rtol=1e-8, atol=1e-8)
+    
+    # If the 'passed_top' event didn't trigger, the bead stalled/fell
+    if run.t_events[0].size == 0:
+        return -10.0
+        
+    theta_run, omega_run = run.sol(np.linspace(0, run.t_events[0][0], 1001))
+  
+    # Filter for the upper portion of the loop and find the minimum normal force
+    return normal_force(theta_run, omega_run)[theta_run >= np.pi/2].min()
+
+
+def critical_propulsion():
+    """
+    Return F_p,crit: propulsion at which min F_N over the top half of the first
+    loop is zero, starting from rest at the left vertical.
+    """
+    # Bracket the root by doubling f_p until the bead clears the loop with a positive normal force
+    f_p_high = m*g
+    while lowest_normal_force(f_p_high) < 0:
+        f_p_high *= 2
+
+    # Find the exact f_p where the minimum normal force is exactly 0
+    return brentq(lowest_normal_force, 0.0, f_p_high)
+
+if __name__ == "__main__":
+    f_p_crit = critical_propulsion()
+
+# Given those same conditions and being allowed to continue with the
+# same propulsive force, what is the largest g-force the vehicle will
+# attain once in an asymptotic condition where loop by loop it is no
+# longer gaining speed?
+def asymptotic_g_force(f_p):
+    """
+    Return F_N/(m g) sampled along a 1000*tau integration at this propulsion.
+    """
+    if c == 0 and mu == 0:
+        raise ValueError("no dissipation: speed grows forever, so there is no asymptotic g-force")
+
+    # Run a long simulation with the critical f_p to reach a steady state
+    long_run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(f_p,),
+                         dense_output=True, rtol=1e-8, atol=1e-8)
+    t_sample = np.linspace(0, 1000*tau, 100001)
+    return normal_force(*long_run.sol(t_sample)) / (m*g)
+
+if __name__ == "__main__":
+    g_force = asymptotic_g_force(f_p_crit)
     print("max g-force = {:.2f} g".format(g_force[-len(g_force)//16:].max()))
