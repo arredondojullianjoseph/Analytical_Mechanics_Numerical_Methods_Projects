@@ -131,7 +131,7 @@ def lowest_normal_force(f_p):
     
     # If the 'passed_top' event didn't trigger, the bead stalled/fell
     if run.t_events[0].size == 0:
-        return -10.0
+        return -np.inf
         
     theta_run, omega_run = run.sol(np.linspace(0, run.t_events[0][0], 1001))
   
