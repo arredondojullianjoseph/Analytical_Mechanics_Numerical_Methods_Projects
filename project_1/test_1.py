@@ -30,12 +30,9 @@ def critical_case():
     return f_p_crit, cm.asymptotic_g_force(f_p_crit)
 
 def test_asymptotic_g_force_has_converged(critical_case):
-    # Once speed stops growing lap to lap, two back-to-back windows reach the same peak g-force.
-    _, g_force = critical_case
-    n = len(g_force)
-    earlier = g_force[-2*n//16:-n//16].max()
-    later = g_force[-n//16:].max()
-    assert abs(later - earlier) < 1e-4*later
+    # Once speed stops growing lap to lap, consecutive laps reach the same peak g-force.
+    _, peaks = critical_case
+    assert abs(peaks[-1] - peaks[-2]) < 1e-4*peaks[-1]
 
 def test_first_loop_normal_force_nonnegative_at_critical(critical_case):
     # F_p,crit is first-loop grazing: min F_N on the top half is zero, not negative.

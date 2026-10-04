@@ -32,7 +32,7 @@ g-force is $F_N/(mg)$.
 - **Time scale:** time windows are in units of $\tau = \sqrt{R/g}$, so that they can work for any loop size.
 - **Critical force:** the bead starts from rest at the left vertical section ($\theta = -\pi/2$). `brentq` finds the $F_p$ where the smallest $F_N$ over the top half of the first loop is exactly zero (the grazing-coaster diagnostic).
 - **Events:** each first-loop run stops when the bead clears the top half or stalls.
-- **Asymptotic g-force:** the critical case runs for $1000\tau$, and the max of $F_N/(mg)$ is taken over the last sixteenth.
+- **Asymptotic g-force:** each lap is $+2\pi$ in $\theta$ from the left vertical. Peak $F_N/(mg)$ is compared lap to lap; when consecutive laps agree, that peak is the reported g-force. The run is capped at $1000\tau$.
 - **Figures:** GIF and plots use the default parameters ($F_p = 10$ N, rest at the bottom). The critical-force search runs after that.
 - **Automated tests:** `project_1/test_1.py` checks the model against physics that can be worked out by hand, using pytest.
 
@@ -70,7 +70,7 @@ All generalized forces separately vs time: propulsion, gravity, linear drag, and
 | --- | --- |
 | Normal force at the top | $F_N = 0$ when $R\dot{\theta}^2 = g$ at $\theta = \pi$. |
 | Work-energy | The change in mechanical energy equals the work done by propulsion, drag, and friction, to 1 part in $10^5$ |
-| Asymptotic convergence | The peak g-force in the last sixteenth of the run matches the peak in the sixteenth before it, so speed has stopped growing loop to loop |
+| Asymptotic convergence | Consecutive laps have the same peak g-force, so speed has stopped growing loop to loop |
 | First-loop grazing | At $F_{p,\mathrm{crit}}$, the smallest $F_N$ on the top half of the first loop is zero and not negative |
 
 ### Limitations

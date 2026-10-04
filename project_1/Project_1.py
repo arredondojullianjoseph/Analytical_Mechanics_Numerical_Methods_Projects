@@ -90,18 +90,26 @@ def critical_propulsion():
 # same propulsive force, what is the largest g-force the vehicle will
 # attain once in an asymptotic condition where loop by loop it is no
 # longer gaining speed?
+def completed_lap(t, S, f_p):
+    """triggered after each +2π from the left vertical."""
+    return np.sin((S[0] + np.pi/2) / 2)
+completed_lap.direction = -1
+
 def asymptotic_g_force(f_p):
-    """
-    Return F_N/(m g) sampled along a 1000*tau integration at this propulsion.
-    """
+    """Peak F_N/(m g) on each lap until consecutive laps agree."""
     if c == 0 and mu == 0:
         raise ValueError("no dissipation: speed grows forever, so there is no asymptotic g-force")
 
-    # Run a long simulation with the critical f_p to reach a steady state
-    long_run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(f_p,),
-                         dense_output=True, rtol=1e-8, atol=1e-8)
-    t_sample = np.linspace(0, 1000*tau, 100001)
-    return normal_force(*long_run.sol(t_sample)) / (m*g)
+    run = solve_ivp(dSdt, [0, 1000*tau], [-np.pi/2, 0.0], args=(f_p,),
+                    events=completed_lap, dense_output=True, rtol=1e-8, atol=1e-8)
+    times = np.concatenate(([0.0], run.t_events[0][run.t_events[0] > 0]))
+    peaks = []
+    for t0, t1 in zip(times[:-1], times[1:]):
+        peak = normal_force(*run.sol(np.linspace(t0, t1, 1001))).max() / (m*g)
+        peaks.append(peak)
+        if len(peaks) >= 2 and abs(peaks[-1] - peaks[-2]) < 1e-4*peaks[-1]:
+            return peaks
+    raise ValueError("laps never settled")
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
@@ -170,5 +178,4 @@ if __name__ == "__main__":
     fig.savefig(out_dir / "forces.png", dpi=150)
 
     f_p_crit = critical_propulsion()
-    g_force = asymptotic_g_force(f_p_crit)
-    print("max g-force = {:.2f} g".format(g_force[-len(g_force)//16:].max()))
+    print("max g-force = {:.2f} g".format(asymptotic_g_force(f_p_crit)[-1]))
